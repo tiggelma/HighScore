@@ -46,6 +46,7 @@ if (  ($platvorm!="")
    && ($score!="")
    && ($naam!="") )
 {
+	
   if (!$result = $conn->query('SELECT * FROM Highscores WHERE Platvorm="'.$platvorm.'" AND Game="'.$game.'"')) {
     die ('There was an error running query[' . $conn->error . ']');}
 
@@ -66,7 +67,16 @@ if (  ($platvorm!="")
 }
 
 
-if (!$result = $conn->query('SELECT Platvorm, Game, Score, Persoon, WanneerBehaald, TIMESTAMPDIFF(DAY,Naamwissel,SYSDATE()) As Dagen FROM Highscores order by WanneerBehaald DESC')) {
+/*SELECT Platvorm
+      ,Game
+	  ,MAX(Score)
+	  ,Persoon
+	  ,WanneerBehaald
+	  ,TIMESTAMPDIFF(DAY,Naamwissel,SYSDATE()) Dagen 
+FROM Highscores 
+GROUP BY Platvorm, Game
+ORDER BY WanneerBehaald DESC	*/
+if (!$result = $conn->query('SELECT Platvorm, Game, MAX(Score), Persoon, WanneerBehaald, TIMESTAMPDIFF(DAY,Naamwissel,SYSDATE()) As Dagen FROM Highscores GROUP BY Platvorm, Game order by WanneerBehaald DESC')) {
     die ('There was an error running query[' . $conn->error . ']');
 }
 
