@@ -24,6 +24,7 @@
 <TR>
 <?php
 
+/* Connect to the database
 $conn = new mysqli("localhost", "root");
 if (mysqli_connect_errno())
   {
@@ -46,17 +47,19 @@ if (  ($platvorm!="")
    && ($score!="")
    && ($naam!="") )
 {
-	
-  if (!$result = $conn->query('SELECT * FROM Highscores WHERE Platvorm="'.$platvorm.'" AND Game="'.$game.'"')) {
+
+  /* Check if the Game/Platform/Name combination already exists in the database
+  if (!$result = $conn->query('SELECT * FROM Highscores WHERE Platvorm="'.$platvorm.'" AND Game="'.$game.'" AND Persoon=".$naam.'"')) {
     die ('There was an error running query[' . $conn->error . ']');}
 
   $row_cnt = mysqli_num_rows($result);
   
+  /* If a result has been found then do an update, otherwise an insert */
   if( $row_cnt=="1" )
   {
     if (!$result = $conn->query('UPDATE Highscores 
-	                             SET Score="'.$score.'", WanneerBehaald=NOW(), Naamwissel = CASE WHEN Persoon="'.$naam.'" THEN Naamwissel ELSE NOW() END, Persoon="'.$naam.'" 
-								 WHERE Platvorm="'.$platvorm.'" AND Game="'.$game.'"')) {
+	                             SET Score="'.$score.'", WanneerBehaald=NOW(), Persoon="'.$naam.'" 
+								 WHERE Platvorm="'.$platvorm.'" AND Game="'.$game.'" AND Persoon="'.$naam.'"')) {
       die ('There was an error running query[' . $conn->error . ']');  }
   }
   else
@@ -67,6 +70,7 @@ if (  ($platvorm!="")
 }
 
 
+/* Retrieve a table where newest high-score first. And days will get a score when there is another entry (day-diff)
 /*SELECT Platvorm
       ,Game
 	  ,MAX(Score)
@@ -76,7 +80,7 @@ if (  ($platvorm!="")
 FROM Highscores 
 GROUP BY Platvorm, Game
 ORDER BY WanneerBehaald DESC	*/
-if (!$result = $conn->query('SELECT Platvorm, Game, MAX(Score), Persoon, WanneerBehaald, TIMESTAMPDIFF(DAY,Naamwissel,SYSDATE()) As Dagen FROM Highscores GROUP BY Platvorm, Game order by WanneerBehaald DESC')) {
+if (!$result = $conn->query('SELECT Platvorm, Game, Score, Persoon, WanneerBehaald, TIMESTAMPDIFF(DAY,Naamwissel,SYSDATE()) As Dagen FROM Highscores GROUP BY Platvorm, Game order by WanneerBehaald DESC')) {
     die ('There was an error running query[' . $conn->error . ']');
 }
 
